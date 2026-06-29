@@ -1,3 +1,82 @@
+<?php
+//学生データ
+$students = [
+    ["name" => "田中太郎", "score" => 85],
+    ["name" => "佐藤花子", "score" => 92],
+    ["name" => "鈴木一郎", "score" => 78],
+    ["name" => "高橋美咲", "score" => 65],
+    ["name" => "伊藤健太", "score" => 58],
+];
+
+//成績判定の関数
+function scoreJudgement(string $name, int $score): string{
+    if ($score >= 90){
+        //点数が90点以上の場合、評価A
+        $grade = "A";
+
+    } elseif ($score >= 80){
+        //点数が80点以上の場合、評価B
+        $grade = "B";
+
+    }elseif ($score >= 70){
+        //点数が70点以上の場合、評価C
+        $grade = "C";
+
+    }elseif ($score >= 60){
+        //点数が60点以上の場合、評価D
+        $grade = "D";
+
+    }else{
+        //点数が60点未満の場合、評価F
+        $grade = "F";
+    }
+
+    return "{$name}: {$score}点 - 評価{$grade}";
+}
+
+//合格者・不合格者の集計関数
+function countPassFail(array $students): array{
+    $pass = 0;//合格者数
+    $fail = 0;//不合格者数
+
+    // 学生データを一人ずつ取り出す
+    foreach ($students as $student) {
+
+        if ($student["score"] >= 60){
+            // 60点以上の場合、合格者に追加
+            $pass++;
+        } else{
+            //60点未満の場合、不合格者に追加
+            $fail++;
+        }
+    }
+
+    // 合格者数と不合格者数を配列で返却
+    return [
+        "pass" => $pass,
+        "fail" => $fail,
+    ];
+
+}
+
+// 平均点の計算関数
+function calculateAverageScore(array $students): float
+{
+    $totalSocre = 0;//合計点
+
+    foreach ($students as $student){
+        // 各学生の点数を合計点に加算
+        $totalSocre += $student["score"];
+    }
+
+    //平均点＝合計点 ÷ 生徒の数
+    return $totalSocre/ count($students);
+}
+
+//関数呼び出し
+$passFail = countPassFail($students);
+$averageScore = calculateAverageScore($students);
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,85 +85,25 @@
     <title>成績判定システム</title>
 </head>
 <body>
-    <?php
-    //定義
-    //学生データ
-    $students = [
-        ["name" => "田中太郎", "score" => 85],
-        ["name" => "佐藤花子", "score" => 92],
-        ["name" => "鈴木一郎", "score" => 78],
-        ["name" => "高橋美咲", "score" => 65],
-        ["name" => "伊藤健太", "score" => 58],
-    ];
-    ?>
+    <h1>成績判定システム</h1>
+    <h2>【個別成績】</h2>
+    <div>
+        <?php foreach($students as $student): ?>
+        <p>
+            <?= scoreJudgement($student["name"], $student["score"]) ?>
+        </p>
 
-    <!-- タイトル -->
-    <p><strong>成績判定システム</strong></p>
+        <?php endforeach; ?>
+    </div>
 
-    <!-- サブタイトル -->
-    <p><strong>【個人成績】</strong></p>
+    <h2>【統計情報】</h2>
+    <div>
 
-    <?php
-    //成績判定ロジック
-    foreach ($students as $student) {
+        <p>合格者: <?= $passFail["pass"] ?>人</p>
+        <p>不合格者: <?= $passFail["fail"] ?>人</p>
+        <!-- 平均点（小数点第一位まで）を表示 -->
+        <p>平均点: <?= number_format($averageScore, 1) ?>点</p>
 
-        //90点以上の場合、評価A(優秀)
-    if ($student['score'] >= 90) {
-        echo $student['name']. ': '. $student['score']. '点 - 評価A（優秀）<br>';
-    }
-
-    //80点以上90点未満の場合、評価B(良好)
-    elseif ($student['score'] >= 80 && $student['score'] < 90) {
-        echo $student['name']. ': '. $student['score']. '点 - 評価B（良好）<br>';
-    }
-
-    //70点以上80点未満の場合、評価C(普通)
-    elseif ($student['score'] >= 70 && $student['score'] < 80) {
-        echo $student['name']. ': '. $student['score']. '点 - 評価C（普通）<br>';
-    }
-
-    //60点以上70点未満の場合、評価D(要努力)
-    elseif ($student['score'] >= 60 && $student['score'] < 70) {
-        echo $student['name'].': '. $student['score']. '点 - 評価D（要努力）<br>';
-    }
-
-    //60点未満の場合、評価F(不合格)
-    else {
-    echo $student['name']. ': '. $student['score']. '点 - 評価F（不合格）<br>';
-    }
-
-    }
-    ?>
-
-    <!-- サブタイトル -->
-    <p><strong>【統計情報】</strong></p>
-    <?php
-    $PassedCount = 0; //合格者
-    $FailedCount = 0; //不合格者
-    $StudentCount = count($students);//生徒数
-    $TotalScore = 0; //合計点
-
-    foreach ($students as $student) {
-        //60点以上の場合、合格者に追加
-        if ($student['score'] >= 60) {
-        $PassedCount += 1;
-        }
-        //60点未満の場合、不合格者に追加
-        else{
-            $FailedCount += 1;
-        }
-    }
-
-    echo '合格者: '. $PassedCount. '人'. '<br>';
-    echo '不合格者: '. $FailedCount.'人'. '<br>';
-
-    //平均点
-    foreach ($students as $student) {
-        $TotalScore += $student['score'];
-    }
-
-    echo '平均点: '.($TotalScore / $StudentCount). '点';
-    ?>
-
+    </div>
 </body>
 </html>
